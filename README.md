@@ -1,6 +1,5 @@
 # alu-machine_learning
 
-This Python script generates a bar chart showing the quantity of different fruits distributed among three persons.
 
 ## Usage
 

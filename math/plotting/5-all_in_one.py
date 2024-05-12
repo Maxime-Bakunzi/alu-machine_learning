@@ -38,13 +38,13 @@ axs[0, 0].set_ylabel('Y-axis', fontsize='x-small')
 
 # Plot 2
 axs[0, 1].scatter(x1, y1, s=10, c="purple")
-axs[0, 1].set_title("Plot 2", fontsize='x-small')
+axs[0, 1].set_title("Men's Height vs Weight", fontsize='x-small')
 axs[0, 1].set_xlabel('Height (in)', fontsize='x-small')
 axs[0, 1].set_ylabel('Weight (lbs)', fontsize='x-small')
 
 # Plot 3
 axs[1, 0].plot(x2, y2)
-axs[1, 0].set_title("Plot 3", fontsize='x-small')
+axs[1, 0].set_title("Exponential Decay of C-14", fontsize='x-small')
 axs[1, 0].set_xlabel("Time (years)", fontsize='x-small')
 axs[1, 0].set_ylabel("Fraction Remaining", fontsize='x-small')
 axs[1, 0].set_yscale('log')
