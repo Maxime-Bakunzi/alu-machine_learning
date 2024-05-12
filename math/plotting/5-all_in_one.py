@@ -52,7 +52,8 @@ axs[1, 0].set_yscale('log')
 # Plot 4
 axs[1, 1].plot(x3, y31, color="red", linestyle="--", label="C-14")
 axs[1, 1].plot(x3, y32, color="green", label="Ra-226")
-axs[1, 1].set_title("Plot 4", fontsize='x-small')
+axs[1, 1].set_title(
+    "Exponential Decay of Radioactive Elements", fontsize='x-small')
 axs[1, 1].set_xlabel("Time (years)", fontsize='x-small')
 axs[1, 1].set_ylabel("Fraction Remaining", fontsize='x-small')
 axs[1, 1].legend()
@@ -60,7 +61,7 @@ axs[1, 1].legend()
 # Plot 5
 z = np.arange(0, 110, 10)
 axs[2, 0].hist(student_grades, bins=z, edgecolor="black")
-axs[2, 0].set_title("Plot 5", fontsize='x-small')
+axs[2, 0].set_title("Project A", fontsize='x-small')
 axs[2, 0].set_xlabel("Grades", fontsize='x-small')
 axs[2, 0].set_ylabel("Number of Students", fontsize='x-small')
 axs[2, 0].set_xlim(0, 100)
