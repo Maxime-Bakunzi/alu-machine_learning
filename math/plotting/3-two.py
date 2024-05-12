@@ -9,7 +9,6 @@ t2 = 1600
 y1 = np.exp((r / t1) * x)
 y2 = np.exp((r / t2) * x)
 
-# your code here
 plt.plot(x, y1, color="red", linestyle="--", label="C-14")
 plt.plot(x, y2, color="green", label="Ra-226")
 plt.xlabel("Time (years)")

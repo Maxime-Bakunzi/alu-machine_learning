@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 np.random.seed(5)
 student_grades = np.random.normal(68, 15, 50)
 
-# your code here
 x = student_grades 
 
 z = np.arange(0, 110, 10)

@@ -2,7 +2,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Data for plots
 y0 = np.arange(0, 11) ** 3
 x0 = np.arange(0, 11)
 mean = [69, 0]
@@ -68,14 +67,7 @@ axs[2, 0].set_xlim(0, 100)
 axs[2, 0].set_ylim(0, 30)
 axs[2, 0].set_xticks(z)
 
-# Removing empty subplot
 fig.delaxes(axs[2, 1])
-
-# Adjust layout
 plt.tight_layout()
-
-# Overall title
 fig.suptitle("All in One", fontsize='x-small')
-
-# Show plot
 plt.show()
