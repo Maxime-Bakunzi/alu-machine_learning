@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Function that calculates the adjugate matrix of a matrix"""
+"""Module of  Function that calculates the adjugate matrix of a matrix"""
 
 
 def determinant(matrix):
