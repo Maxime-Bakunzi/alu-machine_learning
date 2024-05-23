@@ -8,10 +8,18 @@ This project contains implementations of various linear algebra operations using
 - NumPy 1.15
 - pycodestyle 2.5
 
-## How to run
-To calculate the determinant of a matrix, use the `determinant` function provided in the `0-determinant.py` file.
+## Installation
 
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/Maxime-Bakunzi/alu-machine_learning.git
+   ```
 Example usage:
 ```bash
 ./0-main.py
+./1-minor.py
+./2-cofactor.py
+./3-adjugate.py
+./4-inverse.py
+./5-definiteness.py
 ```
