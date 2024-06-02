@@ -31,7 +31,8 @@ def poly_integral(poly, C=0):
     integral_coeffs = [C] + [coef / (i + 1) for i, coef in enumerate(poly)]
 
     # Convert float coefficients to integers if they are whole numbers
-    integral_coeffs = [int(coef) if isinstance(coef, float) and coef.is_integer() else coef for coef in integral_coeffs]
+    integral_coeffs = [int(coef) if isinstance(coef, float) and
+                       coef.is_integer() else coef for coef in integral_coeffs]
 
     # Remove trailing zeros except for the integration constant
     while len(integral_coeffs) > 1 and integral_coeffs[-1] == 0:
