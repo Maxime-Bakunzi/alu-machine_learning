@@ -25,4 +25,7 @@ def poly_integral(poly, C=0):
     integral_coeffs = [coef / (i + 1) for i, coef in enumerate(poly)]
     integral_coeffs.insert(0, C)  # Add integration constant
 
+    # Round to integers if coefficient is very close to an integer
+    integral_coeffs = [round(coef) if abs(coef - round(coef)) < 1e-10 else coef for coef in integral_coeffs]
+
     return integral_coeffs
