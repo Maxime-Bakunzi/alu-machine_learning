@@ -22,10 +22,18 @@ def poly_integral(poly, C=0):
     if not isinstance(C, int):
         return None
 
+    
+    if poly == [0]:
+        return [C]
+
     integral_coeffs = [coef / (i + 1) for i, coef in enumerate(poly)]
     integral_coeffs.insert(0, C)  # Add integration constant
 
     # Round to integers if coefficient is very close to an integer
-    integral_coeffs = [round(coef) if abs(coef - round(coef)) < 1e-10 else coef for coef in integral_coeffs]
+    integral_coeffs = [int(coef) if isinstance(coef, float) and coef.is_integer() else coef for coef in integral_coeffs]
+
+    # Remove unnecessary trailing zeros (not including the constant term)
+    while len(integral_coeffs) > 1 and integral_coeffs[-1] == 0:
+        integral_coeffs.pop()
 
     return integral_coeffs
