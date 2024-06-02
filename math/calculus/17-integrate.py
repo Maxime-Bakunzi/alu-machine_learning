@@ -23,7 +23,7 @@ def poly_integral(poly, C=0):
         return None
 
     
-    if poly == [0]:
+    if poly==[] or poly == [0]:
         return [C]
 
     integral_coeffs = [coef / (i + 1) for i, coef in enumerate(poly)]
