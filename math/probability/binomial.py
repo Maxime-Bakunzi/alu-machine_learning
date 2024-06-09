@@ -60,6 +60,26 @@ class Binomial:
         pmf_value = bin_coeff * (self.p ** k) * ((1 - self.p) ** (self.n - k))
         return pmf_value
 
+    def cdf(self, k):
+        """
+        Calculates the value of the CDF for a given number of "successes".
+
+        Parameters:
+        k (int): The number of "successes".
+
+        Returns:
+        float: The CDF value for k.
+        """
+        if not isinstance(k, int):
+            k = int(k)
+        if k < 0:
+            return 0
+        if k > self.n:
+            k = self.n
+
+        cdf_value = sum(self.pmf(i) for i in range(k + 1))
+        return cdf_value
+
     def factorial(self, x):
         """
         Calculates the factorial of a number.
