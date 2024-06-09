@@ -28,7 +28,10 @@ class Binomial:
                 raise TypeError("data must be a list")
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
-            self.n = round(sum(data) / len(data))
-            self.p = sum(data) / (len(data) * self.n)
-            self.n = round(sum(data) / len(data))
-            self.p = sum(data) / (len(data) * self.n)
+            
+            mean = sum(data) / len(data)
+            variance = sum((x - mean) ** 2 for x in data) / len(data)
+            p_estimate = 1 - (variance / mean)
+            n_estimate = round(mean / p_estimate)
+            self.n = n_estimate
+            self.p = mean / self.n
