@@ -77,15 +77,25 @@ class Normal:
         return coef * exp
 
     def cdf(self, x):
-        '''calculates the cdf of a value x'''
+        """
+        Calculates the value of the CDF for  a given x-value
+        Args:
+            x (float): The x-value
+
+        Returns:
+            float: The PDF value for x
+
+        """
         mean = self.mean
         stddev = self.stddev
         pi = 3.1415926536
         value = (x - mean) / (stddev * (2 ** (1 / 2)))
+
         # estimate the erf using taylor series expansion
         erf = value - ((value ** 3) / 3) + ((value ** 5) / 10)
         erf = erf - ((value ** 7) / 42) + ((value ** 9) / 216)
+
         # calculate the cdf from the estimated erf
         erf *= (2 / (pi ** (1 / 2)))
-        cdf = (1 / 2) * (1 + erf)
-        return cdf
+
+        return (1 / 2) * (1 + erf)
