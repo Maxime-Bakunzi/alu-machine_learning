@@ -77,29 +77,15 @@ class Normal:
         return coef * exp
 
     def cdf(self, x):
-        """
-        Calculates the value of the CDF for a given x-value
-
-        Args:
-            x (float): The x-value
-
-        Returns:
-            float: The CDF value for x
-        """
-        # Constants for the approximation
-        a1 =  0.254829592
-        a2 = -0.284496736
-        a3 =  1.421413741
-        a4 = -1.453152027
-        a5 =  1.061405429
-        p  =  0.3275911
-
-        # Save the sign of x
-        sign = 1 if x >= self.mean else -1
-        z = abs((x - self.mean) / self.stddev)
-
-        # A&S formula 7.1.26 approximation for erf
-        t = 1.0 / (1.0 + p * z)
-        y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * (2.7182818285 ** (-z * z))
-
-        return 0.5 * (1.0 + sign * y)
+        '''calculates the cdf of a value x'''
+        mean = self.mean
+        stddev = self.stddev
+        pi = 3.1415926536
+        value = (x - mean) / (stddev * (2 ** (1 / 2)))
+        # estimate the erf using taylor series expansion
+        erf = value - ((value ** 3) / 3) + ((value ** 5) / 10)
+        erf = erf - ((value ** 7) / 42) + ((value ** 9) / 216)
+        # calculate the cdf from the estimated erf
+        erf *= (2 / (pi ** (1 / 2)))
+        cdf = (1 / 2) * (1 + erf)
+        return cdf
