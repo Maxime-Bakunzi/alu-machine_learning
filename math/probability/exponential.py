@@ -51,3 +51,23 @@ class Exponential:
 
         pdf = lambtha * (e ** (-lambtha * x))
         return pdf
+
+    def cdf(self, x):
+        """
+        Calculates the value of the CDF for a given time period
+
+        Args:
+            x (float): The time period
+
+        Returns:
+            float: The CDF value for x
+        """
+        if x < 0:
+            return 0
+
+        # Using the formula F(x; lambtha) = 1 - e^(-lambtha * x)
+        e = 2.7182818285
+        lambtha = self.lambtha
+
+        cdf = 1 - (e ** (-lambtha * x))
+        return cdf
