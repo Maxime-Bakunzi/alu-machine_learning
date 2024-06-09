@@ -53,10 +53,11 @@ class Binomial:
             return 0
 
         # Calculate binomial coefficient
-        binom_coeff = self.factorial(self.n)//(self.factorial(k)*self.factorial(self.n-k))
+        bin_coeff = self.factorial(
+                self.n)//(self.factorial(k)*self.factorial(self.n-k))
 
         # Calculate PMF
-        pmf_value = binom_coeff * (self.p ** k) * ((1 - self.p) ** (self.n - k))
+        pmf_value = bin_coeff * (self.p ** k) * ((1 - self.p) ** (self.n - k))
         return pmf_value
 
     def factorial(self, x):
