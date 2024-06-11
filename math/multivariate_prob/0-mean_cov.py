@@ -16,7 +16,7 @@ def mean_cov(X):
 
     n, d = X.shape
 
-    if X.ndim != 2:
+    if X.ndim != 2 or not isinstance(X, np.ndarray):
         raise TypeError("X must be a 2D numpy.ndarray")
 
     if n < 2:
