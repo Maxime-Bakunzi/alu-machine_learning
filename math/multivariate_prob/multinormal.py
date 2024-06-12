@@ -16,14 +16,14 @@ class MultiNormal:
         if not isinstance(data, np.ndarray) or data.ndim != 2:
             raise TypeError("data must be a 2D numpy.ndarray")
         
-        n, d = data.shape
+        d, n = data.shape
 
         if n < 2:
             raise ValueError("data must contain multiple data points")
 
         mean = np.mean(data, axis=1, keepdims=True)
 
-        covariance = ((mean - data) @ (mean - data).T) / (n - 1)
+        covariance = ((data - mean) @ (data - mean).T) / (n - 1)
 
         self.mean = mean
         self.cov = covariance
