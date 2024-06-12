@@ -13,10 +13,10 @@ class MultiNormal:
 
     def __init__(self, data):
 
-        n, d = data.shape
-
         if not isinstance(data, np.ndarray) or data.ndim != 2:
             raise TypeError("data must be a 2D numpy.ndarray")
+        
+        n, d = data.shape
 
         if n < 2:
             raise ValueError("data must contain multiple data points")
