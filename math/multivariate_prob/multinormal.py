@@ -47,7 +47,7 @@ class MultiNormal:
         det_cov = np.linalg.det(self.cov)
         norm_factor = 1.0 / (np.sqrt((2 * np.pi) ** d * det_cov))
 
-        exponent = -0.5 * ((x - self.mean).T @ inverse_cov * (x - self.mean))
+        exponent = -0.5 * ((x - self.mean).T @ inverse_cov @ (x - self.mean))
 
         pdf = norm_factor * np.exp(exponent).item()
 
