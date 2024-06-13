@@ -38,7 +38,7 @@ class MultiNormal:
         if not isinstance(x, np.ndarray):
             raise TypeError("x must be a numpy.ndarray")
 
-        d, n = x.shape
+        d, n = self.mean.shape
 
         if x.shape != (d, 1):
             raise ValueError("x must have the shape ({}, 1)".format(d))
