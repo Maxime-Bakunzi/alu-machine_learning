@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-import numpy as np
 """
 This module calculates the likelihood of patients developing
 severe side effects
 """
+
+
+import numpy as np
 
 
 def likelihood(x, n, P):
