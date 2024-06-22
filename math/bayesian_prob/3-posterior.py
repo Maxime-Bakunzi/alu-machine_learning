@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This module calculates the posterior probabilty for the various hypothetical 
+This module calculates the posterior probabilty for the various hypothetical
 probabilites of developing severe side effects
 """
 
@@ -132,7 +132,7 @@ def marginal(x, n, P, Pr):
 
 def posterior(x, n, P, Pr):
     """
-    Calculates the posterior probability for the various hypothetical 
+    Calculates the posterior probability for the various hypothetical
     probabilities of developing severe side effects given the data.
 
     Parameters:
@@ -164,7 +164,7 @@ def posterior(x, n, P, Pr):
         raise ValueError("All values in Pr must be in the range [0, 1]")
     if not np.isclose(np.sum(Pr), 1):
         raise ValueError("Pr must sum to 1")
-    
+
     # Calculate intersection
     intersection_values = intersection(x, n, P, Pr)
 
