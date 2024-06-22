@@ -1,4 +1,3 @@
-
 # Bayesian Probability
 
 This project focuses on implementing various Bayesian probability calculations using Python. The code is compliant with `pycodestyle` and is designed to work with Python 3.5 and `numpy` 1.15 on Ubuntu 16.04 LTS.
@@ -154,3 +153,9 @@ To validate and test the implementation, you can use the provided `main.py` file
 ```bash
 $ ./3-main.py
 ```
+---
+> You can Clone the github repository
+
+```bash
+git clone https://github.com/Maxime-Bakunzi/alu-machine_learning
+``` 
