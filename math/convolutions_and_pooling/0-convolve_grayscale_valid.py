@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+This module for performing a valid convolution on grayscale images.
+"""
+
+
 import numpy as np
 
 
