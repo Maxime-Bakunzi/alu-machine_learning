@@ -29,7 +29,7 @@ def convolve_grayscale_valid(images, kernel):
     output_w = w - kw + 1
 
     # Initialize the output array
-    convolved = np.zeros(m, output_h, output_w)
+    convolved = np.zeros((m, output_h, output_w))
 
     # Perform convolution
     for i in range(output_h):
