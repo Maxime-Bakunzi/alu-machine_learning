@@ -61,7 +61,7 @@ def convolve_channels(images, kernel, padding='same', stride=(1, 1)):
             slice_w_end = slice_w_start + kw
             convolved[:, i, j] = np.sum(padded_images
                                         [:, slice_h_start:slice_h_end,
-                                         slice_w_start:slice_w_end]
+                                         slice_w_start:slice_w_end, :]
                                         * kernel, axis=(1, 2, 3))
 
     return convolved
