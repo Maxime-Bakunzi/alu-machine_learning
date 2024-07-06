@@ -33,7 +33,7 @@ def convolve(images, kernel, padding='same', stride=(1, 1)):
         ph = ((h - 1) * sh + kh - h) // 2 + 1
         pw = ((w - 1) * sw + kw - w) // 2 + 1
     elif padding == 'valid':
-        ph, pw = (0, 0)
+        ph = pw = 0
     else:
         ph, pw = padding
 
