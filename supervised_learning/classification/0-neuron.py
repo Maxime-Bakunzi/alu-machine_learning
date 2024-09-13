@@ -24,7 +24,7 @@ class Neuron:
         """
         # input validation
         if not isinstance(nx, int):
-            raise TypeError("nx must be integer")
+            raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
 
