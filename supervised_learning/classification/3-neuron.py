@@ -78,9 +78,9 @@ class Neuron:
             float: The cost of the model.
 
         """
-        m = Y.shape[1] # number of examples
+        m = Y.shape[1]  # number of examples
         # Compute the cost using cross-entropy
         cost = - (1 / m) * np.sum(Y * np.log(A) + (1 - Y) *
-                                   np.log(1.0000001 - A))
+                                  np.log(1.0000001 - A))
 
         return cost
