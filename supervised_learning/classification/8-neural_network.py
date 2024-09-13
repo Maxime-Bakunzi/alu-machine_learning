@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This is a module for a neuron network.
+This is a module of a neuron network.
 """
 
 import numpy as np
@@ -36,12 +36,12 @@ class NeuralNetwork:
         if nodes < 1:
             raise ValueError("nodes must be a positive integer")
 
-        # Weights and bias for the hidden layer
+        # Weights and bias of the hidden layer
         self.W1 = np.random.randn(nodes, nx)  # Random normal initialization
         self.b1 = np.zeros((nodes, 1))  # Bias initialization with zeros
         self.A1 = 0  # Activated output of the output neuron initialize to 0
 
-        # Weights and biases for the output neuron
+        # Weights and biases of the output neuron
         self.W2 = np.random.randn(1, nodes)  # Random normal initialization
         self.b2 = 0  # Bias initialization to 0
         self.A2 = 0  # Activated output of the output neuron initialized to 0
