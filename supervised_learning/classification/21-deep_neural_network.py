@@ -161,7 +161,7 @@ class DeepNeuralNetwork:
             self.__weights['w{}'.format(l)] = Wl - alpha * dw
             self.__weights['b{}'.format(l)] = bl - alpha * db
 
-            # Compute dz for the previous layer
+            # Compute dz of the previous layer
             if l > 1:
                 # Derivative of sigmoid
                 dz = np.dot(Wl.T, dz) * A_prev * (1 - A_prev)
