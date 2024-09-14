@@ -199,10 +199,10 @@ class DeepNeuralNetwork:
         for i in range(iterations):
             A, cache = self.forward_prop(X)  # Forward propagation
 
-            # Compute cost evry 100 iterations of monitoring
-            if i % 100 == 0:
-                cost = self.cost(Y, A)
-                print("Cost after {} iterations: {}".format(i, cost))
+            # Compute cost every 100 iterations of monitoring
+            # if i % 100 == 0:
+            #     cost = self.cost(Y, A)
+            #     print("Cost after {} iterations: {}".format(i, cost))
 
             # Perform one step of gradient descent
             self.gradient_descent(Y, cache, alpha)
