@@ -145,23 +145,22 @@ class DeepNeuralNetwork:
         """
 
         m = Y.shape[1]
-        A_L = cache['A{}'.format(self.__L)]
-        dz = A_L - Y  # Derivative of cost with respect to A_L (output layer)
+        L = self.__L
 
-        for l in range(self.__L, 0, -1):
-            A_prev = cache['A{}'.format(l - 1)]
-            Wl = self.__weights['W{}'.format(l)]
-            bl = self.__weights['b{}'.format(l)]
+        # Backpropagation
+        dZ = cache['A' + str(L)] - Y
+        for l in reversed(range(1, L + 1)):
+            A_prev = cache['A' + str(l - 1)]
+            W = self.__weights['W' + str(l)]
+            b = self.__weights['b' + str(l)]
 
-            # Compute gradients
-            dw = (1 / m) * np.dot(dz, A_prev.T)
-            db = (1 / m) * np.sum(dz, axis=1, keepdims=True)
+            dW = np.dot(dZ, A_prev.T) / m
+            db = np.sum(dZ, axis=1, keepdims=True) / m
+
+            if l > 1:
+                dA = np.dot(W.T, dZ)
+                dZ = dA * (A_prev * (1 - A_prev))
 
             # Update weights and biases
-            self.__weights['w{}'.format(l)] = Wl - alpha * dw
-            self.__weights['b{}'.format(l)] = bl - alpha * db
-
-            # Compute dz of the previous layer
-            if l > 1:
-                # Derivative of sigmoid
-                dz = np.dot(Wl.T, dz) * A_prev * (1 - A_prev)
+            self.__weights['W' + str(l)] -= alpha * dW
+            self.__weights['b' + str(l)] -= alpha * db
