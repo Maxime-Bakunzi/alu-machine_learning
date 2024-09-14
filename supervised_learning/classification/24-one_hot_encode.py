@@ -1,4 +1,4 @@
-#!/usr/bin/env/ python3
+#!/usr/bin/env python3
 """
 The Module of converting numeric label into one-hot matrix
 """
