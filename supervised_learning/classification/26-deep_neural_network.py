@@ -169,55 +169,49 @@ class DeepNeuralNetwork:
 
     def train(self, X, Y, iterations=5000, alpha=0.05,
               verbose=True, graph=True, step=100):
-        """Trains the neural network
+        """
+        Trains the neural network
 
         Args:
             X (numpy.ndarray): Input data with shape (nx, m).
             Y (numpy.ndarray): Correct labels with shape (1, m)
             iterations (int): Number of iterations to train over.
             alpha (float): Learning rate.
+            verbose (bool): Whether to print information about the training.
+            graph (bool): Whether to graph information about the training.
+            step (int): The step to print information or graph.
 
         Raises:
             TypeError: If iterations is not integer or alpha is not float.
             ValueError: If iterations or alpha are not positive.
 
         Returns:
-            tuple: The evaluation of the trainiing data after
-            iterations of training
+            tuple: The evaluation of the training data after iterations
         """
 
-        # Validate iterations
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
             raise ValueError("iterations must be a positive integer")
-
-        # Validate alpha
         if not isinstance(alpha, float):
             raise TypeError("alpha must be a float")
         if alpha <= 0:
             raise ValueError("alpha must be positive")
-
-        # Validate step
         if not isinstance(step, int):
             raise TypeError("step must be an integer")
         if step <= 0 or step > iterations:
-            raise ValueError("step must be positive and <= iterations")
+            step = iterations
 
-        # List to store costs to use in plotting
         costs = []
-
-        # Perform training over the specified number of iterations
         for i in range(iterations + 1):
             A, cache = self.forward_prop(X)
+            self.gradient_descent(Y, cache, alpha)
             cost = self.cost(Y, A)
-            if i % step == 0 or i == iterations:
-                if verbose:
-                    print("Cost after {} iterations: {}".format(i, cost))
-                if graph:
-                    costs.append(cost)
-            if i < iterations:
-                self.gradient_descent(Y, cache, alpha)
+
+            if verbose and i % step == 0:
+                print("Cost after {} iterations: {}".format(i, cost))
+            if graph and i % step == 0:
+                costs.append(cost)
 
         if graph:
             plt.plot(range(0, iterations + 1, step), costs)
@@ -228,10 +222,9 @@ class DeepNeuralNetwork:
 
         return self.evaluate(X, Y)
 
-
     def save(self, filename):
         """
-        Saves the instance object to a file in pickle format.
+        Saves the instance object to a file in pickle format
 
         Args:
             filename (str): The file to which the object should be saved
@@ -248,14 +241,13 @@ class DeepNeuralNetwork:
     @staticmethod
     def load(filename):
         """
-        Loads a pickled DeepNeuralNetwork object from a file.
+        Loads a pickled DeepNeuralNetwork object
 
         Args:
-            filename (str): The file from the object should be loaded
+            filename (str): The file from which the object should be loaded
 
         Returns:
-            DeepNeuralNetwork: The loaded object, or None if filename
-            doesn't exit
+            DeepNeuralNetwork: The loaded object, or None if file doesn't exist
         """
         try:
             with open(filename, 'rb') as file:
