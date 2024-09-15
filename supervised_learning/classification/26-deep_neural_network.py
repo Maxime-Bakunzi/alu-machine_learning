@@ -231,6 +231,9 @@ class DeepNeuralNetwork:
         """
         try:
             with open(filename, 'rb') as file:
-                return pickle.load(file)
+                loaded_obj = pickle.load(file)
+                # Ensure consistent numpy print options
+                np.set_printoptions(threshold=20, edgeitems=10, linewidth=80)
+                return loaded_obj
         except FileNotFoundError:
             return None
