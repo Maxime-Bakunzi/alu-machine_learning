@@ -33,7 +33,9 @@ class DeepNeuralNetwork:
             raise ValueError("nx must be a positive integer")
         if not isinstance(layers, list) or not layers:
             raise TypeError("layers must be a list of positive integers")
-        if not all(map(lambda x: isinstance(x, int) and x > 0, layers)):
+        if not all(
+                map(lambda layer: isinstance(layer, int)
+                    and layer > 0, layers)):
             raise TypeError("layers must be a list of positive integers")
         if activation not in ['sig', 'tanh']:
             raise ValueError("activation must be 'sig' or 'tanh'")
@@ -43,13 +45,13 @@ class DeepNeuralNetwork:
         self.__weights = {}
         self.__activation = activation
 
-        for l in range(1, self.__L + 1):
-            layer_size = layers[l - 1]
-            input_size = nx if l == 1 else layers[l - 2]
+        for le in range(1, self.L + 1):
+            layer_size = layers[le - 1]
+            input_size = nx if le == 1 else layers[le - 2]
 
-            self.__weights['W' + str(l)] = np.random.randn(layer_size,
-                                                        input_size) * np.sqrt(2 / input_size)
-            self.__weights['b' + str(l)] = np.zeros((layer_size, 1))
+            self.__weights['W' + str(le)] = np.random.randn(
+                layer_size, input_size) * np.sqrt(2 / input_size)
+            self.__weights['b' + str(le)] = np.zeros((layer_size, 1))
 
     @property
     def L(self):
@@ -104,6 +106,8 @@ class DeepNeuralNetwork:
 
             Z = np.dot(W, A_prev) + b
 
+            # Use softmax for the output layer,
+            # chosen activation for hidden layers
             if le == self.__L:
                 A = self.softmax(Z)
             else:
@@ -114,7 +118,7 @@ class DeepNeuralNetwork:
 
             self.__cache['A' + str(le)] = A
 
-        return self.__cache['A' + str(self.__L)], self.__cache
+        return A, self.__cache
 
     def cost(self, Y, A):
         """
@@ -199,9 +203,6 @@ class DeepNeuralNetwork:
 
             self.__weights['W' + str(layer)] -= alpha * dW
             self.__weights['b' + str(layer)] -= alpha * db
-
-    def tanh(self, Z):
-        return np.tanh(Z)
 
     def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True,
               graph=True, step=100):
