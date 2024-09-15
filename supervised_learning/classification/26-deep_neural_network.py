@@ -211,10 +211,12 @@ class DeepNeuralNetwork:
         Saves the instance object to a file in pickle format
 
         Args:
-            filename (str): The file to which the object should be saved
+            filename (str): The file to which the object should
+            be saved
         """
         if not filename.endswith('.pkl'):
             filename += '.pkl'
+
         with open(filename, 'wb') as file:
             pickle.dump(self, file)
 
@@ -224,16 +226,15 @@ class DeepNeuralNetwork:
         Loads a pickled DeepNeuralNetwork object
 
         Args:
-            filename (str): The file from which the object should be loaded
+            filename (str): The file from which the object should
+            be loaded
 
         Returns:
-            DeepNeuralNetwork: The loaded object, or None if file doesn't exist
+            DeepNeuralNetwork: The loaded object, or None if filename
+            doesn't exist
         """
         try:
             with open(filename, 'rb') as file:
-                loaded_obj = pickle.load(file)
-                # Ensure consistent numpy print options
-                np.set_printoptions(threshold=20, edgeitems=10, linewidth=80)
-                return loaded_obj
+                return pickle.load(file)
         except FileNotFoundError:
             return None
