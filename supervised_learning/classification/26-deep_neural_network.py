@@ -5,7 +5,6 @@ Module about the deep neural network performing binary classification.
 
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 import pickle
 
 
@@ -229,11 +228,16 @@ class DeepNeuralNetwork:
 
         return self.evaluate(X, Y)
 
-    
+
     def save(self, filename):
         """
         Saves the instance object to a file in pickle format.
-        If filename does not have the extension .pkl, it adds it.
+
+        Args:
+            filename (str): The file to which the object should be saved
+
+        Returns:
+            None
         """
         if not filename.endswith('.pkl'):
             filename += '.pkl'
@@ -245,10 +249,16 @@ class DeepNeuralNetwork:
     def load(filename):
         """
         Loads a pickled DeepNeuralNetwork object from a file.
-        Returns the loaded object, or None if filename doesn’t exist.
-        """
-        if not os.path.exists(filename):
-            return None
 
-        with open(filename, 'rb') as file:
-            return pickle.load(file)
+        Args:
+            filename (str): The file from the object should be loaded
+
+        Returns:
+            DeepNeuralNetwork: The loaded object, or None if filename
+            doesn't exit
+        """
+        try:
+            with open(filename, 'rb') as file:
+                return pickle.load(file)
+        except FileNotFoundError:
+            return None
