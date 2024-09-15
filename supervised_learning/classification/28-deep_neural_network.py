@@ -34,8 +34,7 @@ class DeepNeuralNetwork:
         if not isinstance(layers, list) or not layers:
             raise TypeError("layers must be a list of positive integers")
         if not all(
-                map(lambda layer: isinstance(layer, int)
-                    and layer > 0, layers)):
+                map(lambda layer: isinstance(layer, int) and layer > 0, layers)):
             raise TypeError("layers must be a list of positive integers")
         if activation not in ['sig', 'tanh']:
             raise ValueError("activation must be 'sig' or 'tanh'")
