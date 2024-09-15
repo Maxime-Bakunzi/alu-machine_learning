@@ -39,9 +39,9 @@ class DeepNeuralNetwork:
                     and layer > 0, layers)):
             raise TypeError("layers must be a list of positive integers")
 
-        self.__L = len(layers)  # number of layers
-        self.__cache = {}  # intermediary values of the network
-        self.__weights = {}  # weights and bias of the network
+        self.__L = len(layers)
+        self.__cache = {}
+        self.__weights = {}
 
         for le in range(1, self.__L + 1):
             layer_size = layers[le - 1]
@@ -81,15 +81,15 @@ class DeepNeuralNetwork:
             The output of the neural and the cache respectively
         """
 
-        self.__cache['A0'] = X  # Input data is A0
+        self.__cache['A0'] = X
 
         for l in range(1, self.__L + 1):
-            Wl = self.__weights['W{}'.format(l)]
-            bl = self.__weights['b{}'.format(l)]
-            Al_prev = self.__cache['A{}'.format(l - 1)]
-            Zl = np.dot(Wl, Al_prev) + bl  # Linear transformation
-            Al = self.sigmoid(Zl)  # Apply sigmoid activation function
-            self.__cache['A{}'.format(l)] = Al  # Actvated output in cache
+            Wl = self.__weights['W' + str(l)]
+            bl = self.__weights['b' + str(l)]
+            Al_prev = self.__cache['A' + str(l - 1)]
+            Zl = np.dot(Wl, Al_prev) + bl
+            Al = self.sigmoid(Zl)
+            self.__cache['A' + str(l)] = Al
 
         return Al, self.__cache
 
@@ -105,51 +105,40 @@ class DeepNeuralNetwork:
             The cost (logistic regression cost)
         """
 
-        m = Y.shape[1]  # number of examples
-
-        # Compute the cost using the logistic regression cost function
+        m = Y.shape[1]
         cost = -np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A)) / m
-
         return cost
 
     def evaluate(self, X, Y):
         """
-        Evaluate teh neural network's prediction
+        Evaluate the neural network's prediction
 
         Args:
-            X (numy.ndarray): input data with shape (nx, m)
-            Y (numpy.ndarray): Corrext labels with shape (1, m)
+            X (numpy.ndarray): input data with shape (nx, m)
+            Y (numpy.ndarray): Correct labels with shape (1, m)
 
         Returns:
-            The neuron's prediction
-            The cost of the network
+            The neuron's prediction and the cost of the network
         """
 
-        # Forward propagation to get predictions
         A, _ = self.forward_prop(X)
-
-        # Predict based om A, with a threshold of 0.5
         prediction = np.where(A >= 0.5, 1, 0)
-
-        # Compute the cost
         cost = self.cost(Y, A)
-
         return prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
-        Calculates one pass of gradient on the neural network
+        Calculates one pass of gradient descent on the neural network
 
         Args:
             Y (numpy.ndarray): correct labels with shape (1, m)
             cache (dictionary): intermediary values of the network
-            alpha (float) : learning rate
+            alpha (float): learning rate
         """
 
         m = Y.shape[1]
         L = self.__L
 
-        # Backpropagation
         dZ = cache['A' + str(L)] - Y
         for l in reversed(range(1, L + 1)):
             A_prev = cache['A' + str(l - 1)]
@@ -163,7 +152,6 @@ class DeepNeuralNetwork:
                 dA = np.dot(W.T, dZ)
                 dZ = dA * (A_prev * (1 - A_prev))
 
-            # Update weights and biases
             self.__weights['W' + str(l)] -= alpha * dW
             self.__weights['b' + str(l)] -= alpha * db
 
@@ -180,10 +168,6 @@ class DeepNeuralNetwork:
             verbose (bool): Whether to print information about the training.
             graph (bool): Whether to graph information about the training.
             step (int): The step to print information or graph.
-
-        Raises:
-            TypeError: If iterations is not integer or alpha is not float.
-            ValueError: If iterations or alpha are not positive.
 
         Returns:
             tuple: The evaluation of the training data after iterations
@@ -228,13 +212,9 @@ class DeepNeuralNetwork:
 
         Args:
             filename (str): The file to which the object should be saved
-
-        Returns:
-            None
         """
         if not filename.endswith('.pkl'):
             filename += '.pkl'
-
         with open(filename, 'wb') as file:
             pickle.dump(self, file)
 
