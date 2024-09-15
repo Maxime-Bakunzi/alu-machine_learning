@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Module that defines a deep neural network
-with binary classification"""
+"""This script allows different activation functions"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,23 +7,18 @@ import pickle
 
 
 class DeepNeuralNetwork:
-    """
-    Defines a deep neural network performing binary classification
+    """defines a deep neural network
+    with multiclass classification.
     """
 
     def __init__(self, nx, layers, activation='sig'):
-        """
-        Class constructor for DeepNeuralNetwork
+        """class constructor
 
         Args:
-            nx (int): number of input features
-            layers (list): list representing the number of nodes in each layer
-
-        Raises:
-            TypeError: If nx is not an integer
-            ValueError: If nx is less than 1
-            TypeError: If layers is not a list or is empty
-            TypeError: If elements in layers are not all positive integers
+            nx (int): is the number of input features
+            layers (list): is a list representing the number
+            of nodes in each layer of the network
+            activation (str): the activation function to use in hidden layers
         """
 
         if not isinstance(nx, int):
@@ -120,15 +114,15 @@ class DeepNeuralNetwork:
         return A, self.__cache
 
     def cost(self, Y, A):
-        """
-        Calculates the cost of the model using logistic regression
+        """Calculates the cost of the model
+        using categorical cross-entropy
 
         Args:
-            Y (numpy.ndarray): Correct labels with shape(1, m)
-            A (numpy.ndarray): Activated output with shape (1, m)
-
-        Returns:
-            The cost (logistic regression cost)
+            Y (array): is a numpy.ndarray with shape (classes, m)
+            that contains the correct labels of the input data
+            A (array): is a numpy.ndarray with shape (classes, m)
+            containing the activated output of the neuron
+            of each example
         """
 
         # number of examples
@@ -142,16 +136,14 @@ class DeepNeuralNetwork:
         return cost
 
     def evaluate(self, X, Y):
-        """
-        Evaluate teh neural network's prediction
+        """Evaluates the neural network
+        predictions
 
         Args:
-            X (numy.ndarray): input data with shape (nx, m)
-            Y (numpy.ndarray): Corrext labels with shape (1, m)
-
-        Returns:
-            The neuron's prediction
-            The cost of the network
+            X (array): is a numpy.ndarray with shape (nx, m)
+            that contains the input data
+            Y (array): is a numpy.ndarray with shape (classes, m)
+            that contains the correct labels of the input data
         """
 
         # propagation to get the network output
@@ -166,20 +158,18 @@ class DeepNeuralNetwork:
 
         return prediction_one_hot, cost
 
-    def sigmoid_derivative(self, A):
-        """
-        Derivative of the sigmoid function of backpropagation
-        """
-        return A * (1 - A)
-
     def gradient_descent(self, Y, cache, alpha=0.05):
-        """
-        Calculates one pass of gradient on the neural network
+        """Calculates one pass of gradient descent
+        on the neural network
 
         Args:
-            Y (numpy.ndarray): correct labels with shape (1, m)
-            cache (dictionary): intermediary values of the network
-            alpha (float) : learning rate
+            Y (array): is a numpy.ndarray with shape (classes, m)
+            that contains the correct labels of
+            the input data
+            cache (dict): is a dictionary containing
+            all the intermediary values of the network
+            alpha (float, optional): is the learning rate
+            Defaults to 0.05.
         """
 
         m = Y.shape[1]
@@ -205,22 +195,7 @@ class DeepNeuralNetwork:
 
     def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True,
               graph=True, step=100):
-        """Trains the neural network
-
-        Args:
-            X (numpy.ndarray): Input data with shape (nx, m).
-            Y (numpy.ndarray): Correct labels with shape (1, m)
-            iterations (int): Number of iterations to train over.
-            alpha (float): Learning rate.
-
-        Raises:
-            TypeError: If iterations is not integer or alpha is not float.
-            ValueError: If iterations or alpha are not positive.
-
-        Returns:
-            tuple: The evaluation of the trainiing data after
-            iterations of training
-        """
+        """Trains the deep neural network"""
 
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
