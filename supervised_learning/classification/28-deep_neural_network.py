@@ -19,14 +19,12 @@ class DeepNeuralNetwork:
         Args:
             nx (int): number of input features
             layers (list): list representing the number of nodes in each layer
-            activation (str): activation function to use in hidden layers
 
         Raises:
             TypeError: If nx is not an integer
             ValueError: If nx is less than 1
             TypeError: If layers is not a list or is empty
             TypeError: If elements in layers are not all positive integers
-            ValueError: If activation is not 'sig' or 'tanh'
         """
 
         if not isinstance(nx, int):
@@ -46,9 +44,12 @@ class DeepNeuralNetwork:
         self.__activation = activation
 
         for l in range(1, self.__L + 1):
-            self.__weights['W' + str(l)] = np.random.randn(layers[l-1], nx if l ==
-                                                           1 else layers[l-2]) * np.sqrt(2 / (nx if l == 1 else layers[l-2]))
-            self.__weights['b' + str(l)] = np.zeros((layers[l-1], 1))
+            layer_size = layers[l - 1]
+            input_size = nx if l == 1 else layers[l - 2]
+
+            self.__weights['W' + str(l)] = np.random.randn(layer_size,
+                                                        input_size) * np.sqrt(2 / input_size)
+            self.__weights['b' + str(l)] = np.zeros((layer_size, 1))
 
     @property
     def L(self):
@@ -70,26 +71,49 @@ class DeepNeuralNetwork:
         """Getter of the activation function"""
         return self.__activation
 
+    def sigmoid(self, Z):
+        """Sigmoid activation function"""
+        return 1 / (1 + np.exp(-Z))
+
+    def tanh(self, Z):
+        """Tanh activation function"""
+        return np.tanh(Z)
+
+    def softmax(self, Z):
+        """Softmax activation function"""
+        exp_Z = np.exp(Z - np.max(Z, axis=0, keepdims=True))
+        return exp_Z / np.sum(exp_Z, axis=0, keepdims=True)
+
     def forward_prop(self, X):
-        """Calculates the forward propagation of the neural network
+        """Calculates the propagation
+        of the neural network
 
         Args:
-            X (numpy.ndarray): Input data with shape (nx, m)
-
-        Returns:
-            tuple: Output of the neural network and cache
+            X (array): is a numpy.ndarray
+            with shape (nx, m) that contains
+            the input data
         """
+
+        # Input layer stored as A0
         self.__cache['A0'] = X
-        for l in range(1, self.__L + 1):
-            Z = np.dot(
-                self.__weights['W' + str(l)], self.__cache['A' + str(l-1)]) + self.__weights['b' + str(l)]
-            if l == self.__L:
-                self.__cache['A' + str(l)] = self.softmax(Z)
+
+        for le in range(1, self.__L + 1):
+            W = self.__weights['W' + str(le)]
+            b = self.__weights['b' + str(le)]
+            A_prev = self.__cache['A' + str(le - 1)]
+
+            Z = np.dot(W, A_prev) + b
+
+            if le == self.__L:
+                A = self.softmax(Z)
             else:
                 if self.__activation == 'sig':
-                    self.__cache['A' + str(l)] = 1 / (1 + np.exp(-Z))
+                    A = self.sigmoid(Z)
                 else:  # tanh
-                    self.__cache['A' + str(l)] = np.tanh(Z)
+                    A = self.tanh(Z)
+
+            self.__cache['A' + str(le)] = A
+
         return self.__cache['A' + str(self.__L)], self.__cache
 
     def cost(self, Y, A):
@@ -97,105 +121,139 @@ class DeepNeuralNetwork:
         Calculates the cost of the model using logistic regression
 
         Args:
-            Y (numpy.ndarray): Correct labels with shape (1, m)
+            Y (numpy.ndarray): Correct labels with shape(1, m)
             A (numpy.ndarray): Activated output with shape (1, m)
 
         Returns:
-            float: The cost
+            The cost (logistic regression cost)
         """
+
+        # number of examples
         m = Y.shape[1]
+
+        # Compute cost using categorical cross-entropy
+        # Add a small epsilon to avoid log(0)
         epsilon = 1e-15
-        return -1/m * np.sum(Y * np.log(A + epsilon))
+        cost = -(1 / m) * np.sum(Y * np.log(A + epsilon))
+
+        return cost
 
     def evaluate(self, X, Y):
         """
-        Evaluates the neural network's predictions
+        Evaluate teh neural network's prediction
 
         Args:
-            X (numpy.ndarray): Input data with shape (nx, m)
-            Y (numpy.ndarray): Correct labels with shape (1, m)
+            X (numy.ndarray): input data with shape (nx, m)
+            Y (numpy.ndarray): Corrext labels with shape (1, m)
 
         Returns:
-            tuple: Prediction (numpy.ndarray) and cost (float)
+            The neuron's prediction
+            The cost of the network
         """
+
+        # propagation to get the network output
         A, _ = self.forward_prop(X)
-        prediction = np.eye(Y.shape[0])[np.argmax(A, axis=0)].T
+
+        # Prediction: class with highest probability
+        prediction = np.argmax(A, axis=0)
+        prediction_one_hot = np.eye(Y.shape[0])[prediction].T
+
+        # Calculate the cost
         cost = self.cost(Y, A)
-        return prediction, cost
+
+        return prediction_one_hot, cost
+
+    def sigmoid_derivative(self, A):
+        """
+        Derivative of the sigmoid function of backpropagation
+        """
+        return A * (1 - A)
 
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
-        Calculates one pass of gradient descent on the neural network
+        Calculates one pass of gradient on the neural network
 
         Args:
-            Y (numpy.ndarray): Correct labels with shape (1, m)
-            cache (dict): Intermediary values of the network
-            alpha (float): Learning rate
+            Y (numpy.ndarray): correct labels with shape (1, m)
+            cache (dictionary): intermediary values of the network
+            alpha (float) : learning rate
         """
+
         m = Y.shape[1]
         dZ = cache['A' + str(self.__L)] - Y
-        for l in reversed(range(1, self.__L + 1)):
-            A_prev = cache['A' + str(l-1)]
-            dW = (1/m) * np.dot(dZ, A_prev.T)
-            db = (1/m) * np.sum(dZ, axis=1, keepdims=True)
-            if l > 1:
-                if self.__activation == 'sig':
-                    dZ = np.dot(
-                        self.__weights['W' + str(l)].T, dZ) * (A_prev * (1 - A_prev))
-                else:  # tanh
-                    dZ = np.dot(
-                        self.__weights['W' + str(l)].T, dZ) * (1 - A_prev ** 2)
-            self.__weights['W' + str(l)] -= alpha * dW
-            self.__weights['b' + str(l)] -= alpha * db
 
-    def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True, graph=True, step=100):
-        """
-        Trains the deep neural network
+        for layer in range(self.__L, 0, -1):
+            A_prev = cache['A' + str(layer - 1)]
+
+            dW = (1 / m) * np.dot(dZ, A_prev.T)
+            db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
+
+            if layer > 1:
+                W = self.__weights['W' + str(layer)]
+                dA = np.dot(W.T, dZ)
+                A = cache['A' + str(layer - 1)]
+                if self.__activation == 'sig':
+                    dZ = dA * (A * (1 - A))
+                else:  # tanh
+                    dZ = dA * (1 - A ** 2)
+
+            self.__weights['W' + str(layer)] -= alpha * dW
+            self.__weights['b' + str(layer)] -= alpha * db
+
+    def tanh(self, Z):
+        return np.tanh(Z)
+
+    def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True,
+              graph=True, step=100):
+        """Trains the neural network
 
         Args:
-            X (numpy.ndarray): Input data with shape (nx, m)
+            X (numpy.ndarray): Input data with shape (nx, m).
             Y (numpy.ndarray): Correct labels with shape (1, m)
-            iterations (int): Number of iterations to train over
-            alpha (float): Learning rate
-            verbose (bool): Whether to print information about the training
-            graph (bool): Whether to graph information about the training
-            step (int): Step for printing verbose information and graphing
+            iterations (int): Number of iterations to train over.
+            alpha (float): Learning rate.
+
+        Raises:
+            TypeError: If iterations is not integer or alpha is not float.
+            ValueError: If iterations or alpha are not positive.
 
         Returns:
-            tuple: Evaluation of the training data after iterations of training
+            tuple: The evaluation of the trainiing data after
+            iterations of training
         """
 
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
             raise ValueError("iterations must be a positive integer")
-            
+
         if not isinstance(alpha, float):
             raise TypeError("alpha must be a float")
         if alpha <= 0:
             raise ValueError("alpha must be positive")
-        if verbose or graph:
-            if not isinstance(step, int):
-                raise TypeError("step must be an integer")
-            if step <= 0 or step > iterations:
-                raise ValueError("step must be positive and <= iterations")
+
+        if not isinstance(step, int):
+            raise TypeError("step must be an integer")
+        if step <= 0:
+            raise ValueError("step must be positive")
 
         costs = []
-        for i in range(iterations + 1):
+
+        for i in range(iterations):
             A, cache = self.forward_prop(X)
             self.gradient_descent(Y, cache, alpha)
-            cost = self.cost(Y, A)
 
-            if verbose and (i % step == 0 or i == iterations):
-                print("Cost after {} iterations: {}".format(i, cost))
-            if graph and (i % step == 0 or i == iterations):
+            if verbose and i % step == 0 or i == iterations - 1:
+                cost = self.cost(Y, A)
                 costs.append(cost)
+                if verbose:
+                    print("Cost after {} iterations: {}".format(i, cost))
 
         if graph:
-            plt.plot(np.arange(0, iterations + 1, step), costs)
-            plt.xlabel('iteration')
-            plt.ylabel('cost')
-            plt.title('Training Cost')
+            plt.plot(range(0, iterations, step), costs)
+            plt.xlabel("iteration")
+            plt.ylabel("cost")
+            plt.title("Training Cost")
             plt.show()
 
         return self.evaluate(X, Y)
@@ -205,10 +263,12 @@ class DeepNeuralNetwork:
         Saves the instance object to a file in pickle format
 
         Args:
-            filename (str): The file to which the object should be saved
+            filename (str): The file to which the object should
+            be saved
         """
         if not filename.endswith('.pkl'):
             filename += '.pkl'
+
         with open(filename, 'wb') as file:
             pickle.dump(self, file)
 
@@ -218,18 +278,15 @@ class DeepNeuralNetwork:
         Loads a pickled DeepNeuralNetwork object
 
         Args:
-            filename (str): The file from which the object should be loaded
+            filename (str): The file from which the object should
+            be loaded
 
         Returns:
-            DeepNeuralNetwork: The loaded object, or None if filename doesn't exist
+            DeepNeuralNetwork: The loaded object, or None if filename
+            doesn't exist
         """
         try:
             with open(filename, 'rb') as file:
                 return pickle.load(file)
         except FileNotFoundError:
             return None
-
-    def softmax(self, Z):
-        """Compute softmax activation function"""
-        exp_Z = np.exp(Z - np.max(Z, axis=0, keepdims=True))
-        return exp_Z / np.sum(exp_Z, axis=0, keepdims=True)
