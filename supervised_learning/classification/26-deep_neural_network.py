@@ -1,31 +1,25 @@
 #!/usr/bin/env python3
-"""
-Module about the deep neural network performing binary classification.
-"""
+"""MOdule that defines a deep neural network
+with binary classification"""
 
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
+import os
 
 
 class DeepNeuralNetwork:
-    """
-    Defines a deep neural network performing binary classification
+    """defines a deep neural network
+    with binary classification.
     """
 
     def __init__(self, nx, layers):
-        """
-        Class constructor for DeepNeuralNetwork
+        """class constructor
 
         Args:
-            nx (int): number of input features
-            layers (list): list representing the number of nodes in each layer
-
-        Raises:
-            TypeError: If nx is not an integer
-            ValueError: If nx is less than 1
-            TypeError: If layers is not a list or is empty
-            TypeError: If elements in layers are not all positive integers
+            nx (int): is the number of input features
+            layers (list): is a list representing the number
+            of nodes in each layer of the network
         """
 
         if not isinstance(nx, int):
@@ -35,15 +29,14 @@ class DeepNeuralNetwork:
         if not isinstance(layers, list) or not layers:
             raise TypeError("layers must be a list of positive integers")
         if not all(
-                map(lambda layer: isinstance(layer, int)
-                    and layer > 0, layers)):
+                map(lambda layer: isinstance(layer, int) and layer > 0, layers)):
             raise TypeError("layers must be a list of positive integers")
 
         self.__L = len(layers)
         self.__cache = {}
         self.__weights = {}
 
-        for le in range(1, self.__L + 1):
+        for le in range(1, self.L + 1):
             layer_size = layers[le - 1]
             input_size = nx if le == 1 else layers[le - 2]
 
@@ -53,17 +46,17 @@ class DeepNeuralNetwork:
 
     @property
     def L(self):
-        """Getter method of the number of layers"""
+        """Getter of layers"""
         return self.__L
 
     @property
     def cache(self):
-        """Getter method of the cache dictionary"""
+        """Getter of the cache"""
         return self.__cache
 
     @property
     def weights(self):
-        """Getter method of the weights dictionary"""
+        """Getter of the weights"""
         return self.__weights
 
     def sigmoid(self, Z):
@@ -71,137 +64,144 @@ class DeepNeuralNetwork:
         return 1 / (1 + np.exp(-Z))
 
     def forward_prop(self, X):
-        """
-        Calculates the forward propagation of the neural network
+        """Calculates the propagation
+        of the neural network
 
         Args:
-            X (numpy.ndarray): input data with shape (nx ,m)
-
-        Returns:
-            The output of the neural and the cache respectively
+            X (array): is a numpy.ndarray
+            with shape (nx, m) that contains
+            the input data
         """
 
+        # Input layer stored as A0
         self.__cache['A0'] = X
 
-        for l in range(1, self.__L + 1):
-            Wl = self.__weights['W' + str(l)]
-            bl = self.__weights['b' + str(l)]
-            Al_prev = self.__cache['A' + str(l - 1)]
-            Zl = np.dot(Wl, Al_prev) + bl
-            Al = self.sigmoid(Zl)
-            self.__cache['A' + str(l)] = Al
+        for le in range(1, self.__L + 1):
+            W = self.__weights['W' + str(le)]
+            b = self.__weights['b' + str(le)]
+            A_prev = self.__cache['A' + str(le - 1)]
 
-        return Al, self.__cache
+            Z = np.dot(W, A_prev) + b
+            A = self.sigmoid(Z)
+            self.__cache['A' + str(le)] = A
+
+        return A, self.__cache
 
     def cost(self, Y, A):
-        """
-        Calculates the cost of the model using logistic regression
+        """Calculates the cost of the model
+        using logistic regression
 
         Args:
-            Y (numpy.ndarray): Correct labels with shape(1, m)
-            A (numpy.ndarray): Activated output with shape (1, m)
-
-        Returns:
-            The cost (logistic regression cost)
+            Y (array): is a numpy.ndarray with shape (1, m)
+            that contains the correct labels of the input data
+            A (array): is a numpy.ndarray with shape (1, m)
+            containing the activated output of the neuron
+            of each example
         """
 
+        # number of examples
         m = Y.shape[1]
-        cost = -np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A)) / m
+
+        # Compute cost using logistic regression
+        cost = -(1 / m) * np.sum(
+            Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A))
+
         return cost
 
     def evaluate(self, X, Y):
-        """
-        Evaluate the neural network's prediction
+        """Evaluates the neural network
+        predictions
 
         Args:
-            X (numpy.ndarray): input data with shape (nx, m)
-            Y (numpy.ndarray): Correct labels with shape (1, m)
-
-        Returns:
-            The neuron's prediction and the cost of the network
+            X (array): is a numpy.ndarray with shape (nx, m)
+            that contains the input data
+            Y (array): is a numpy.ndarray with shape (1, m)
+            that contains the correct labels of the input data
         """
 
+        # propagation to get the network output
         A, _ = self.forward_prop(X)
+
+        # Prediction: A >= 0.5 is classified as 1, otherwise 0
         prediction = np.where(A >= 0.5, 1, 0)
+
+        # Calculate the cost
         cost = self.cost(Y, A)
+
         return prediction, cost
 
-    def gradient_descent(self, Y, cache, alpha=0.05):
+    def sigmoid_derivative(self, A):
         """
-        Calculates one pass of gradient descent on the neural network
+        Derivative of the sigmoid function of backpropagation
+        """
+        return A * (1 - A)
+
+    def gradient_descent(self, Y, cache, alpha=0.05):
+        """Calculates one pass of gradient descent
+        on the neural network
 
         Args:
-            Y (numpy.ndarray): correct labels with shape (1, m)
-            cache (dictionary): intermediary values of the network
-            alpha (float): learning rate
+            Y (array): is a numpy.ndarray with shape (1, m)
+            that contains the correct labels of
+            the input data
+            cache (dict): is a dictionary containing
+            all the intermediary values of the network
+            alpha (float, optional): is the learning rate
+            Defaults to 0.05.
         """
 
         m = Y.shape[1]
-        L = self.__L
+        dZ = cache['A' + str(self.__L)] - Y
 
-        dZ = cache['A' + str(L)] - Y
-        for l in reversed(range(1, L + 1)):
-            A_prev = cache['A' + str(l - 1)]
-            W = self.__weights['W' + str(l)]
-            b = self.__weights['b' + str(l)]
+        for layer in range(self.__L, 0, -1):
+            A_prev = cache['A' + str(layer - 1)]
 
-            dW = np.dot(dZ, A_prev.T) / m
-            db = np.sum(dZ, axis=1, keepdims=True) / m
+            dW = (1 / m) * np.dot(dZ, A_prev.T)
+            db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
 
-            if l > 1:
-                dA = np.dot(W.T, dZ)
+            if layer > 1:
+                dA = np.dot(self.__weights['W' + str(layer)].T, dZ)
                 dZ = dA * (A_prev * (1 - A_prev))
 
-            self.__weights['W' + str(l)] -= alpha * dW
-            self.__weights['b' + str(l)] -= alpha * db
+            self.__weights['W' + str(layer)] -= alpha * dW
+            self.__weights['b' + str(layer)] -= alpha * db
 
-    def train(self, X, Y, iterations=5000, alpha=0.05,
-              verbose=True, graph=True, step=100):
-        """
-        Trains the neural network
-
-        Args:
-            X (numpy.ndarray): Input data with shape (nx, m).
-            Y (numpy.ndarray): Correct labels with shape (1, m)
-            iterations (int): Number of iterations to train over.
-            alpha (float): Learning rate.
-            verbose (bool): Whether to print information about the training.
-            graph (bool): Whether to graph information about the training.
-            step (int): The step to print information or graph.
-
-        Returns:
-            tuple: The evaluation of the training data after iterations
-        """
+    def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True,
+              graph=True, step=100):
+        """Trains the deep neural network"""
 
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
             raise ValueError("iterations must be a positive integer")
+
         if not isinstance(alpha, float):
             raise TypeError("alpha must be a float")
         if alpha <= 0:
             raise ValueError("alpha must be positive")
+
         if not isinstance(step, int):
             raise TypeError("step must be an integer")
-        if step <= 0 or step > iterations:
-            step = iterations
+        if step <= 0:
+            raise ValueError("step must be positive")
 
         costs = []
-        for i in range(iterations + 1):
+
+        for i in range(iterations):
             A, cache = self.forward_prop(X)
             self.gradient_descent(Y, cache, alpha)
-            cost = self.cost(Y, A)
 
-            if verbose and i % step == 0:
-                print("Cost after {} iterations: {}".format(i, cost))
-            if graph and i % step == 0:
+            if verbose and i % step == 0 or i == iterations - 1:
+                cost = self.cost(Y, A)
                 costs.append(cost)
+                if verbose:
+                    print("Cost after {} iterations: {}".format(i, cost))
 
         if graph:
-            plt.plot(range(0, iterations + 1, step), costs)
-            plt.xlabel('iteration')
-            plt.ylabel('cost')
-            plt.title('Training Cost')
+            plt.plot(range(0, iterations, step), costs)
+            plt.xlabel("iteration")
+            plt.ylabel("cost")
+            plt.title("Training Cost")
             plt.show()
 
         return self.evaluate(X, Y)
