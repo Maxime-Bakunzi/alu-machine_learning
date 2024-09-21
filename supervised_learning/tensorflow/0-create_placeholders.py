@@ -12,8 +12,8 @@ def create_placeholders(nx, classes):
         classes (int): The number of classes in our classifier.
 
     Returns:
-        tuple: Two placeholders, x and y, for the neural network.  
-    """ 
+        tuple: Two placeholders, x and y, for the neural network.
+    """
 
     x = tf.placeholder(tf.float32, shape=(None, nx), name="x")
     y = tf.placeholder(tf.float32, shape=(None, classes), name="y")
