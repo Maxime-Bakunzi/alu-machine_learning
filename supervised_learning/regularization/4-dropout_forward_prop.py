@@ -37,9 +37,9 @@ def dropout_forward_prop(X, weights, L, keep_prob):
             A = np.tanh(Z)
 
             # Apply dropout
-            D = np.random.rand(*A.shape) < keep_prob
+            D = np.where(np.random.rand(*A.shape) < keep_prob, 1, 0)
             A *= D
-            A /= keep_prob
+            A /= keep_prob  # Scale the remaining activations by keep_prob
             cache['D{}'.format(le)] = D
 
         cache['A{}'.format(le)] = A
