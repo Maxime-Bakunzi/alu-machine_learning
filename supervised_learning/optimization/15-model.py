@@ -7,34 +7,8 @@ import numpy as np
 import tensorflow as tf
 
 
-def create_placeholders(nx, classes):
-    """
-    Creates placeholders for the tensorflow session
-    
-    Args:
-        nx (int): number of feature columns in our data
-        classes (int): number of classes in our classifier
-
-    Returns:
-        (tf.placeholder, tf.placeholder): placeholders for the input data and labels
-    """
-    x = tf.placeholder(tf.float32, shape=[None, nx], name='x')
-    y = tf.placeholder(tf.float32, shape=[None, classes], name='y')
-    return x, y
-
-
 def create_layer(prev, n, activation):
-    """
-    Creates a layer for the neural network
-    
-    Args:
-        prev: tensor output of the previous layer
-        n (int): number of nodes in the layer to create
-        activation: activation function to use
-
-    Returns:
-        tensor output of the layer
-    """
+    """Creates a layer for the neural network"""
     initializer = tf.contrib.layers.variance_scaling_initializer(
         mode="FAN_AVG")
     layer = tf.layers.Dense(units=n, activation=activation,
@@ -42,67 +16,44 @@ def create_layer(prev, n, activation):
     return layer(prev)
 
 
-def forward_prop(x, layers, activations):
-    """
-    Creates the forward propagation graph for the neural network
-    
-    Args:
-        x: placeholder for the input data
-        layers (list): list containing the number of nodes in each layer
-        activations (list): list containing the activation functions for each layer
+def create_batch_norm_layer(prev, n, activation):
+    """Creates a batch normalization layer for the neural network"""
+    initializer = tf.contrib.layers.variance_scaling_initializer(
+        mode="FAN_AVG")
+    layer = tf.layers.Dense(units=n, kernel_initializer=initializer,
+                            name='layer', activation=None)
+    x = layer(prev)
 
-    Returns:
-        tensor output of the last layer in the neural network
-    """
+    if activation is None:
+        return x
+
+    mean, variance = tf.nn.moments(x, axes=[0])
+    gamma = tf.Variable(tf.constant(1.0, shape=[n]), name='gamma')
+    beta = tf.Variable(tf.constant(0.0, shape=[n]), name='beta')
+    bn = tf.nn.batch_normalization(x, mean, variance, beta, gamma, 1e-8)
+
+    return activation(bn)
+
+
+def forward_prop(x, layers, activations):
+    """Forward propagation with batch normalization"""
     for i in range(len(layers)):
         if i != len(layers) - 1:
-            x = create_layer(x, layers[i], activations[i])
+            x = create_batch_norm_layer(x, layers[i], activations[i])
         else:
-            x = create_layer(x, layers[i], None)
+            x = create_layer(x, layers[i], activations[i])
     return x
 
 
 def calculate_accuracy(y, y_pred):
-    """
-    Calculates the accuracy of the prediction
-    
-    Args:
-        y: placeholder for the labels
-        y_pred: tensor containing the network's predictions
-
-    Returns:
-        tensor containing the decimal accuracy of the prediction
-    """
+    """Calculates the accuracy of the prediction"""
     correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_pred, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     return accuracy
 
 
-def calculate_loss(y, y_pred):
-    """
-    Calculates the softmax cross-entropy loss of the prediction
-    
-    Args:
-        y: placeholder for the labels
-        y_pred: tensor containing the network's predictions
-
-    Returns:
-        tensor containing the loss of the prediction
-    """
-    return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y_pred, labels=y))
-
-
 def shuffle_data(X, Y):
-    """
-    Shuffles the data points in two matrices the same way
-    
-    Args:
-        X: numpy.ndarray of shape (m, nx) containing the input data
-        Y: numpy.ndarray of shape (m, classes) containing the labels
-
-    Returns:
-        the shuffled X and Y matrices
-    """
+    """Shuffles the data points in two matrices the same way"""
     permutation = np.random.permutation(X.shape[0])
     return X[permutation], Y[permutation]
 
@@ -114,30 +65,15 @@ def model(Data_train, Data_valid, layers, activations, alpha=0.001, beta1=0.9,
     Builds, trains, and saves a neural network model in tensorflow using Adam
     optimization, mini-batch gradient descent, learning rate decay, and batch
     normalization
-    
-    Args:
-        Data_train (tuple): contains the training inputs and labels
-        Data_valid (tuple): contains the validation inputs and labels
-        layers (list): contains the number of nodes in each layer
-        activations (list): contains the activation functions for each layer
-        alpha (float): learning rate
-        beta1 (float): weight for the first moment in Adam optimization
-        beta2 (float): weight for the second moment in Adam optimization
-        epsilon (float): small number to avoid division by zero
-        decay_rate (int): decay rate for inverse time decay of the learning rate
-        batch_size (int): number of data points in the mini-batch
-        epochs (int): number of times the training should pass through the whole dataset
-        save_path (str): path where the model should be saved
-
-    Returns:
-        str: the path where the model was saved
     """
     nx = Data_train[0].shape[1]
     classes = Data_train[1].shape[1]
 
-    x, y = create_placeholders(nx, classes)
+    x = tf.placeholder(tf.float32, shape=[None, nx], name='x')
+    y = tf.placeholder(tf.float32, shape=[None, classes], name='y')
+
     y_pred = forward_prop(x, layers, activations)
-    loss = calculate_loss(y, y_pred)
+    loss = tf.losses.softmax_cross_entropy(y, y_pred)
     accuracy = calculate_accuracy(y, y_pred)
 
     global_step = tf.Variable(0, trainable=False)
