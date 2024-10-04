@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Module for calculating F1 score from a confusion matrix"""
 import numpy as np
 sensitivity = __import__('1-sensitivity').sensitivity
