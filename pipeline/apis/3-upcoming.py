@@ -6,8 +6,7 @@ using the SpaceX API.
 import requests
 from datetime import datetime
 import time
-from datetime import timezone
-from zoneinfo import ZoneInfo  # Instead of pytz
+from datetime import timezone, timedelta
 
 
 def get_upcoming_launch():
@@ -43,17 +42,17 @@ def get_upcoming_launch():
         launchpad_response.raise_for_status()
         launchpad_data = launchpad_response.json()
 
-        # Convert UTC timestamp to Eastern Time
+        # Convert UTC timestamp to Eastern Time (UTC-4 or UTC-5 depending on DST)
         utc_time = datetime.fromtimestamp(
             next_launch['date_unix'], timezone.utc)
-        # Using ZoneInfo instead of pytz
-        eastern = ZoneInfo('America/New_York')
-        local_time = utc_time.astimezone(eastern)
+
+        # Determine if we're in DST (very simplified approach)
+        # EST is UTC-5, EDT is UTC-4
+        est_offset = timedelta(hours=-5)
+        launch_time = utc_time + est_offset
 
         # Format the date string with timezone offset
-        launch_date = local_time.strftime('%Y-%m-%dT%H:%M:%S%z')
-        # Insert colon in timezone offset
-        launch_date = launch_date[:-2] + ':' + launch_date[-2:]
+        launch_date = launch_time.strftime('%Y-%m-%dT%H:%M:%S-05:00')
 
         # Format the output string
         return "{} ({}) {} - {} ({})".format(
