@@ -10,7 +10,8 @@ import time
 
 def get_upcoming_launch():
     """
-    Fetches and returns formatted information about the next upcoming SpaceX  launch.
+    Fetches and returns formatted information about the next upcoming SpaceX
+    launch.
 
     Returns:
         str: Formatted string containing launch information
