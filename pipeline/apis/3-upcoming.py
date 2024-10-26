@@ -7,25 +7,21 @@ import requests
 from datetime import datetime
 import time
 from datetime import timezone
-import pytz
+from zoneinfo import ZoneInfo  # Instead of pytz
 
 
 def get_upcoming_launch():
     """
-    Fetches and returns formatted information about the next upcoming SpaceX
-    launch.
-
+    Fetches and returns formatted information about the next upcoming SpaceX launch.
     Returns:
         str: Formatted string containing launch information
     """
     api_url = "https://api.spacexdata.com/v4/launches/upcoming"
-
     try:
         # Get upcoming launches
         response = requests.get(api_url)
         response.raise_for_status()
         launches = response.json()
-
         if not launches:
             return "No upcoming launches found"
 
@@ -50,7 +46,8 @@ def get_upcoming_launch():
         # Convert UTC timestamp to Eastern Time
         utc_time = datetime.fromtimestamp(
             next_launch['date_unix'], timezone.utc)
-        eastern = pytz.timezone('America/New_York')
+        # Using ZoneInfo instead of pytz
+        eastern = ZoneInfo('America/New_York')
         local_time = utc_time.astimezone(eastern)
 
         # Format the date string with timezone offset
@@ -66,7 +63,6 @@ def get_upcoming_launch():
             launchpad_data['name'],
             launchpad_data['locality']
         )
-
     except requests.exceptions.RequestException as e:
         return "Error fetching launch data: {}".format(str(e))
     except (KeyError, ValueError) as e:
