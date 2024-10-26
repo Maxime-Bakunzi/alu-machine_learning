@@ -42,17 +42,16 @@ def get_upcoming_launch():
         launchpad_response.raise_for_status()
         launchpad_data = launchpad_response.json()
 
-        # Convert UTC timestamp to Eastern Time (UTC-4 or UTC-5 depending on DST)
+        # Convert UTC timestamp to Eastern Time
         utc_time = datetime.fromtimestamp(
             next_launch['date_unix'], timezone.utc)
 
-        # Determine if we're in DST (very simplified approach)
-        # EST is UTC-5, EDT is UTC-4
-        est_offset = timedelta(hours=-5)
-        launch_time = utc_time + est_offset
+        # Using EDT (UTC-4) as per the example
+        edt_offset = timedelta(hours=-4)
+        launch_time = utc_time + edt_offset
 
-        # Format the date string with timezone offset
-        launch_date = launch_time.strftime('%Y-%m-%dT%H:%M:%S-05:00')
+        # Format with EDT offset (-04:00)
+        launch_date = launch_time.strftime('%Y-%m-%dT%H:%M:%S-04:00')
 
         # Format the output string
         return "{} ({}) {} - {} ({})".format(
