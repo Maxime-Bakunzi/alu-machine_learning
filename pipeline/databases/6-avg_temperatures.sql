@@ -1,5 +1,5 @@
 -- Displays the average temperature (Fahrenheit) by city ordered by temerature (descending)
 SELECT city, AVG(value) AS avg_temp
-FROM temeratures
+FROM temperatures
 GROUP BY city
 ORDER BY avg_temp DESC;
