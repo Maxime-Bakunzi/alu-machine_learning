@@ -9,5 +9,5 @@ BEGIN
     ELSE
         RETURN a / b;
     END IF;
-END$$
+END $$
 DELIMITER ;
