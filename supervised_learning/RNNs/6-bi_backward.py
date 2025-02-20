@@ -1,50 +1,90 @@
 #!/usr/bin/env python3
 """
-Bidirectional Cell Backward
+Defines the class BidirectionalCell that represents a bidirectional RNN cell
 """
+
 
 import numpy as np
 
 
 class BidirectionalCell:
     """
-    Represents a bidirectional RNN cell.
-    """
+    Represents a birectional RNN cell
 
+    class constructor:
+        def __init__(self, i, h, o)
+
+    public instance attributes:
+
+    public instance methods:
+        def forward(self, h_prev, c_prev, x_t):
+            performs forward propagation for one time step
+        def backward(self, h_next, x_t):
+            calculates the hidden state in backward direction for one time step
+
+    """
     def __init__(self, i, h, o):
         """
-        Initializes the bidirectional RNN cell.
+        Class constructor
 
-        Args:
-            i (int): Number of input features.
-            h (int): Number of hidden units.
-            o (int): Number of output units.
+        parameters:
+            i: dimensionality of the data
+            h: dimensionality of the hidden state
+            o: dimensionality of the outputs
+
+        creates public instance attributes:
+
+        weights should be initialized using random normal distribution
+        weights will be used on the right side for matrix multiplication
+        biases should be initiliazed as zeros
         """
-        self.Whf = np.random.randn(i + h, h)
-        self.Whb = np.random.randn(i + h, h)
-        self.Wy = np.random.randn(2 * h, o)
         self.bhf = np.zeros((1, h))
         self.bhb = np.zeros((1, h))
         self.by = np.zeros((1, o))
+        self.Whf = np.random.normal(size=(h + i, h))
+        self.Whb = np.random.normal(size=(h + i, h))
+        self.Wy = np.random.normal(size=((2 * h), o))
+
+    def forward(self, h_prev, x_t):
+        """
+        Performs forward propagation for one time step
+
+        parameters:
+            h_prev [numpy.ndarray of shape (m, h)]:
+                contains previous hidden state
+                m: the batch size for the data
+                h: dimensionality of hidden state
+            x_t [numpy.ndarray of shape (m, i)]:
+                contains data input for the cell
+                m: the batch size for the data
+                i: dimensionality of the data
+
+        returns:
+            h_next: the next hidden state
+        """
+        h_x = np.concatenate((h_prev, x_t), axis=1)
+        h_next = np.tanh(np.matmul(h_x, self.Whf) + self.bhf)
+
+        return h_next
 
     def backward(self, h_next, x_t):
         """
-        Calculates the hidden state in the backward direction for one time step.
+        Calculates the hidden state in the backward direction for one time step
 
-        Args:
-            h_next (numpy.ndarray): The next hidden state of shape (m, h).
-            x_t (numpy.ndarray): The data input for the cell of shape (m, i).
+        parameters:
+            h_next [numpy.ndarray of shape (m, h)]:
+                contains the next hidden state
+                m: the batch size for the data
+                h: dimensionality of hidden state
+            x_t [numpy.ndarray of shape (m, i)]:
+                contains data input for the cell
+                m: the batch size for the data
+                i: dimensionality of the data
 
-        Returns:
-            numpy.ndarray: The previous hidden state of shape (m, h).
+        returns:
+            h_prev: the previous hidden state
         """
-        m, i = x_t.shape
-        h = h_next.shape[1]
-
-        # Concatenate x_t and h_next
-        concat = np.concatenate((x_t, h_next), axis=1)
-
-        # Compute the previous hidden state
-        h_prev = np.tanh(np.dot(concat, self.Whb) + self.bhb)
+        h_x = np.concatenate((h_next, x_t), axis=1)
+        h_prev = np.tanh(np.matmul(h_x, self.Whb) + self.bhb)
 
         return h_prev
