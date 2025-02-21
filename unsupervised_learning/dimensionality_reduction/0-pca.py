@@ -21,10 +21,17 @@ def pca(X, var=0.95):
     total_var = np.sum(explained_var)
     explained_var_ratios = explained_var / total_var
 
-    # Find the number of components to retain 'var' variance
+    # Find the number of components to retain at least 'var' variance
     cumulative_var = np.cumsum(explained_var_ratios)
-    nd = np.argmax(cumulative_var >= var) + 1
 
-    # Return the weights matrix (principal components)
-    W = Vt[:nd].T
-    return W
+    # Important change: If var is a single value, make it handle as before
+    if isinstance(var, float):
+        nd = np.argmax(cumulative_var >= var) + 1
+        return Vt[:nd].T
+    # If var is a list/array, return components for each threshold
+    elif hasattr(var, '__iter__'):
+        weights = []
+        for v in var:
+            nd = np.argmax(cumulative_var >= v) + 1
+            weights.append(Vt[:nd].T)
+        return weights
