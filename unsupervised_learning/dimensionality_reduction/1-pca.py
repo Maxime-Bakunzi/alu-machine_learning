@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+Defines the function that perfoms PCA on a dataset with dimensionality.
+"""
+
 import numpy as np
 
 
