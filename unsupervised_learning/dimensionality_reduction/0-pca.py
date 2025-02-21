@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+Defines the function that performs PCA on a dataset with zero mean.
+"""
+
 import numpy as np
 
 
