@@ -17,7 +17,7 @@ def pca(X, var=0.95):
         nump.ndarray: Weight matrix W of shape (d, nd) where nd is the new dimensionality.
     """
     # Perform Singular Value Decomposition
-    U, S, Vt = np.lnalg.svd(X, full_matrices=False)
+    U, S, Vt = np.linalg.svd(X, full_matrices=False)
 
     # Calculate the explained varience ratios
     explained_var = S ** 2
