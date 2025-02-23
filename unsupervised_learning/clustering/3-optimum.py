@@ -38,4 +38,27 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
                     size for each cluster size
         or None, None on failure
     """
-    return None, None
+    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+        return None, None
+    if not isinstance(kmin, int) or kmin <= 0:
+        return None, None
+    if not isinstance(kmax, int) or kmax <= 0:
+        return None, None
+    if kmin >= kmax:
+        return None, None
+    if not isinstance(iterations, int) or iterations <= 0:
+        return None, None
+    if kmax is None:
+        kmax = X.shape[0]
+
+    results = []
+    d_vars = []
+    var = float('inf')
+    for k in range(kmin, kmax + 1):
+        C, clss = kmeans(X, k, iterations)
+        results.append((C, clss))
+        new_var = variance(X, C)
+        if k == kmin:
+            var = new_var
+        d_vars.append(var - new_var)
+    return results, d_vars
