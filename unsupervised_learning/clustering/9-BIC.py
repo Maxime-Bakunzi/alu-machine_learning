@@ -55,45 +55,40 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     """
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
         return None, None, None, None
-    if type(kmin) != int or kmin <= 0 or kmin >= X.shape[0]:
-        return None, None, None, None
-    if type(kmax) != int or kmax <= 0 or kmax >= X.shape[0]:
-        return None, None, None, None
-    if kmin >= kmax:
-        return None, None, None, None
-    if type(iterations) != int or iterations <= 0:
-        return None, None, None, None
-    if type(tol) != float or tol <= 0:
-        return None, None, None, None
-    if type(verbose) != bool:
+
+    if not isinstance(kmin, int) or kmin < 1:
         return None, None, None, None
 
-    k_best = []
-    best_res = []
-    logl_val = []
-    bic_val = []
-    n, d = X.shape
+    if not isinstance(kmax, int) or kmax < kmin:
+        return None, None, None, None
+
+    if not isinstance(iterations, int):
+        return None, None, None, None
+
+    if not isinstance(tol, float) or tol < 0:
+        return None, None, None, None
+
+    if not isinstance(verbose, bool):
+        return None, None, None, None
+
+    if kmax is None:
+        kmax = iterations
+
+    n = X.shape[0]
+    prior_bic = 0
+    likelyhoods = bics = []
+    best_k = kmax
+    pi_prev = m_prev = S_prev = best_res = None
     for k in range(kmin, kmax + 1):
-        pi, m, S,  _, log_l = expectation_maximization(X, k, iterations, tol,
-                                                       verbose)
-        k_best.append(k)
-        best_res.append((pi, m, S))
-        logl_val.append(log_l)
+        pi, m, S, g, ll = expectation_maximization(X, k, iterations, tol,
+                                                   verbose)
+        bic = k * np.log(n) - 2 * ll
+        if np.isclose(bic, prior_bic) and best_k >= k:
+            best_k = k - 1
+            best_res = pi_prev, m_prev, S_prev
+        pi_prev, m_prev, S_prev = pi, m, S
+        likelyhoods.append(ll)
+        bics.append(bic)
+        prior_bic = bic
 
-        # code based on gaussian mixture source code n_parameters source code
-        cov_params = k * d * (d + 1) / 2.
-        mean_params = k * d
-        p = int(cov_params + mean_params + k - 1)
-
-        # Formula for this task BIC = p * ln(n) - 2 * l
-        bic = p * np.log(n) - 2 * log_l
-        bic_val.append(bic)
-
-    bic_val = np.array(bic_val)
-    logl_val = np.array(logl_val)
-    best_val = np.argmin(bic_val)
-
-    k_best = k_best[best_val]
-    best_res = best_res[best_val]
-
-    return k_best, best_res, logl_val, bic_val
+    return best_k, best_res, np.asarray(likelyhoods), np.asarray(bics)
