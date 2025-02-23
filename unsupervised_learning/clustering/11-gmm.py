@@ -32,4 +32,15 @@ def gmm(X, k):
             bic [numpy.ndarray of shape (kmax - kmin + 1)]:
                 containting the BIC value for each cluster size tested
     """
-    return None, None, None, None, None
+    # Fit the Gaussian Mixture Model to the data
+    gmm_model = sklearn.mixture.GaussianMixture(n_components=k)
+    gmm_model.fit(X)
+
+    # Extract the required parameters
+    pi = gmm_model.weights_
+    m = gmm_model.means_
+    S = gmm_model.covariances_
+    clss = gmm_model.predict(X)
+    bic = gmm_model.bic(X)
+
+    return pi, m, S, clss, bic
