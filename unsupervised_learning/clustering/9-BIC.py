@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Defines function that finds the best number of clusters for a GMM using
+Defines a function that finds the best number of clusters for a GMM using
 the Bayesian Information Criterion (BIC)
 """
 
